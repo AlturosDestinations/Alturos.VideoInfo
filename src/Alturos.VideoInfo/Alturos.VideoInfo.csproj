@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <Company>Alturos Destinations</Company>
+    <Authors>Alturos Destinations</Authors>
+    <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</RepositoryUrl>
+    <PackageTags>ffprobe</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
