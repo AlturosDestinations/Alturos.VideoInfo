@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</RepositoryUrl>
     <PackageTags>ffprobe</PackageTags>
+    <Description>A .net wrapper for ffprobe</Description>
   </PropertyGroup>
 
   <ItemGroup>
