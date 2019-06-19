@@ -1,5 +1,6 @@
 # Alturos.VideoInfo
 
+Alturos.VideoInfo is a wrapper for ffprobe.
 [ffprobe](https://ffmpeg.org/download.html) is required, it is a part of ffmpeg.
 
 ## nuget
