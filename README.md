@@ -3,7 +3,7 @@
 [ffprobe](https://ffmpeg.org/download.html) is required, it is a part of ffmpeg.
 
 ## nuget
-Quick install Alturos.VideoInfo over [nuget](https://www.nuget.org/packages/VideoInfo)
+Quick install Alturos.VideoInfo over [nuget](https://www.nuget.org/packages/Alturos.VideoInfo)
 ```
 PM> install-package VideoInfo
 ```
