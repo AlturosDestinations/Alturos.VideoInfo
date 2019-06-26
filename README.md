@@ -6,7 +6,7 @@ Alturos.VideoInfo is a wrapper for ffprobe.
 ## nuget
 Quick install Alturos.VideoInfo over [nuget](https://www.nuget.org/packages/Alturos.VideoInfo)
 ```
-PM> install-package VideoInfo
+PM> Install-Package Alturos.VideoInfo
 ```
 
 ## Example
