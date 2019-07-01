@@ -3,13 +3,15 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
     <Company>Alturos Destinations</Company>
     <Authors>Alturos Destinations</Authors>
     <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</RepositoryUrl>
-    <PackageTags>ffprobe</PackageTags>
+    <PackageTags>ffprobe media video audio metadata video-duration</PackageTags>
     <Description>A .net wrapper for ffprobe</Description>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
