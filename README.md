@@ -14,7 +14,8 @@ PM> Install-Package Alturos.VideoInfo
 var videoFilePath = "myVideo.mp4";
 
 var videoAnalyer = new VideoAnalyzer();
-var videoInfo = videoAnalyer.GetVideoInfo(videoFilePath);
+var analyzeResult = videoAnalyer.GetVideoInfo(videoFilePath);
+var videoInfo = analyzeResult.VideoInfo;
 
 //videoInfo.Format.Filename = "TestVideos\\video1.mp4"
 //videoInfo.Format.NbStreams = 1
