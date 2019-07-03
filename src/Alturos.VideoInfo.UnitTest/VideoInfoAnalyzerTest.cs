@@ -75,8 +75,9 @@ namespace Alturos.VideoInfo.UnitTest
             #endregion
 
             var videoAnalyzer = new VideoAnalyzer(ffprobePath);
-            var videoInfo = videoAnalyzer.GetVideoInfo(videoPath);
-            Assert.AreEqual(120, videoInfo.Format.Duration);
+            var anazlyeResult = videoAnalyzer.GetVideoInfo(videoPath);
+            Assert.IsTrue(anazlyeResult.Successful);
+            Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);
         }
     }
 }

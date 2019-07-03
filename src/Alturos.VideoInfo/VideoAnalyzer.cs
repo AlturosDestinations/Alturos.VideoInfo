@@ -1,71 +1,108 @@
-﻿using log4net;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading;
 
 namespace Alturos.VideoInfo
 {
     public class VideoAnalyzer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(VideoAnalyzer));
         private readonly string _ffprobePath;
+        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private readonly int _timeout = 5000;
 
-        public VideoAnalyzer(string ffprobePath = @"ffmpeg\ffprobe.exe")
+        /// <summary>
+        /// VideoAnalyzer
+        /// </summary>
+        /// <param name="ffprobePath"></param>
+        /// <param name="timeout">max ffprobe execution time (ms)</param>
+        public VideoAnalyzer(string ffprobePath = @"ffmpeg\ffprobe.exe", int timeout = 5000)
         {
             this._ffprobePath = ffprobePath;
+
+            var contractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+            };
+
+            this._jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                Formatting = Formatting.Indented
+            };
         }
 
-        public VideoInfoResult GetVideoInfo(string videoFilePath)
+        /// <summary>
+        /// GetVideoInfo
+        /// </summary>
+        /// <param name="videoFilePath">path to the video</param>
+        /// <returns></returns>
+        public AnalyzeResult GetVideoInfo(string videoFilePath)
         {
             if (!File.Exists(videoFilePath))
             {
-                Log.Error($"{nameof(GetVideoInfo)} - File does not exist");
-                return null;
+                return new AnalyzeResult { Successful = false, ErrorMessage = "File does not exist" };
             }
 
             if (!File.Exists(this._ffprobePath))
             {
-                Log.Error($"{nameof(GetVideoInfo)} - FFprobe could not be found {this._ffprobePath}");
-                return null;
+                return new AnalyzeResult { Successful = false, ErrorMessage = $"ffprobe could not be found {this._ffprobePath}" };
             }
 
             var startInfo = new ProcessStartInfo
             {
                 FileName = this._ffprobePath,
                 Arguments = $"-v quiet -print_format json -show_format -show_streams {videoFilePath}",
-                RedirectStandardOutput = true,
                 UseShellExecute = false,
+                RedirectStandardOutput = true,
             };
 
-            try
+            using (var outputWaitHandle = new AutoResetEvent(false))
             {
-                using (var process = Process.Start(startInfo))
+                var json = new StringBuilder();
+
+                var dataReceived = new DataReceivedEventHandler((sender, e) =>
                 {
-                    process.WaitForExit();
-                    var json = process.StandardOutput.ReadToEnd();
-
-                    var contractResolver = new DefaultContractResolver
+                    if (e.Data == null)
                     {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
+                        outputWaitHandle.Set();
+                        return;
+                    }
 
-                    var settings = new JsonSerializerSettings
+                    json.AppendLine(e.Data);
+                });
+
+                var process = new Process();
+
+                try
+                {
+                    process.StartInfo = startInfo;
+                    process.OutputDataReceived += dataReceived;
+
+                    process.Start();
+                    process.BeginOutputReadLine();
+
+                    if (!process.WaitForExit(this._timeout) || !outputWaitHandle.WaitOne(this._timeout))
                     {
-                        ContractResolver = contractResolver,
-                        Formatting = Formatting.Indented
-                    };
+                        return new AnalyzeResult { ErrorMessage = $"Timeout reached {this._timeout} (ms)" };
+                    }
 
-                    return JsonConvert.DeserializeObject<VideoInfoResult>(json, settings);
+                    var videoInfo = JsonConvert.DeserializeObject<VideoInfoResult>(json.ToString(), this._jsonSerializerSettings);
+                    return new AnalyzeResult { Successful = true, VideoInfo = videoInfo };
+                }
+                catch (Exception exception)
+                {
+                    return new AnalyzeResult { Successful = false, ErrorMessage = exception.ToString() };
+                }
+                finally
+                {
+                    process.OutputDataReceived -= dataReceived;
+                    process?.Dispose();
                 }
             }
-            catch (Exception exception)
-            {
-                Log.Error(nameof(GetVideoInfo), exception);
-            }
-
-            return null;
         }
     }
 }

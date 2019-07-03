@@ -12,9 +12,10 @@ namespace Alturos.VideoInfo
         {
             var win64 = "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.1.3-win64-static.zip";
             var win32 = "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-4.1.3-win32-static.zip";
-            var macos64 = "https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.1.3-macos64-static.zip";
 
 #if NETSTANDARD2_0
+            var macos64 = "https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.1.3-macos64-static.zip";
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 return macos64;
