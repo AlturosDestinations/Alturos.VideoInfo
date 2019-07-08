@@ -1,6 +1,6 @@
 # Alturos.VideoInfo
 
-Alturos.VideoInfo is a wrapper for ffprobe.
+With this project you can access the video metadata for example the duration of the video. We are use a ffprobe wrapper in the background.
 [ffprobe](https://ffmpeg.org/download.html) is required, it is a part of ffmpeg.
 
 ## nuget
