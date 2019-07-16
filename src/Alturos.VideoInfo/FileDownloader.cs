@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
@@ -63,10 +63,16 @@ namespace Alturos.VideoInfo
                 {
                     if (!httpResponseMessage.IsSuccessStatusCode)
                     {
-                        return false; ;
+                        return false;
                     }
 
                     var fileContentStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+                    if (!Directory.Exists(filePath))
+                    {
+                        Directory.CreateDirectory(filePath);
+                    }
+
                     using (var sourceStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
                     {
                         fileContentStream.Seek(0, SeekOrigin.Begin);
