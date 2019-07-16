@@ -2,7 +2,7 @@
 
 With this project you can access the metadata of a video (e.g. its duration, bitrate, codec, etc.).
 
-This project uses a wrapper for [ffprobe](https://ffmpeg.org/download.html) in order to achieve this. ffprobe is a part of ffmpeg and extracts information from multimedia streams in a way the output is readable by humans and machines alike. It's required for this project to work.
+This project uses a wrapper for [ffprobe](https://ffmpeg.org/download.html) in order to achieve this. ffprobe is a part of FFmpeg and extracts information from multimedia streams in a way the output is readable by humans and machines alike. It's required for this project to work.
 
 The project comes with a class that automatically downloads the tool for you.
 
@@ -12,7 +12,7 @@ Quickly install Alturos.VideoInfo via [NuGet](https://www.nuget.org/packages/Alt
 PM> Install-Package Alturos.VideoInfo
 ```
 
-## Downloading FFprobe via code
+## Downloading ffprobe via code
 ```cs
 var fileDownloader = new FileDownloader();
 var url = fileDownloader.GetFfmpegPackageUrl();
