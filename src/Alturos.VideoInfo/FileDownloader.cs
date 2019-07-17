@@ -57,9 +57,6 @@ namespace Alturos.VideoInfo
             var fileName = Path.GetFileName(uri.LocalPath);
             var filePath = Path.Combine(destinationPath, fileName);
 
-            var folderName = Path.GetFileNameWithoutExtension(fileName);
-            var folderPath = Path.Combine(destinationPath, folderName);
-
             if (!Directory.Exists(destinationPath))
             {
                 Directory.CreateDirectory(destinationPath);
@@ -88,6 +85,9 @@ namespace Alturos.VideoInfo
                     }
                 }
             }
+
+            var folderName = Path.GetFileNameWithoutExtension(fileName);
+            var folderPath = Path.Combine(destinationPath, folderName);
 
             if (Directory.Exists(folderPath))
             {
