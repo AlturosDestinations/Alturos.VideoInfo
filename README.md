@@ -16,7 +16,12 @@ PM> Install-Package Alturos.VideoInfo
 ```cs
 var fileDownloader = new FileDownloader();
 var url = fileDownloader.GetFfmpegPackageUrl();
-await fileDownloader.DownloadAsync(url, "ffmpeg");
+var result = await fileDownloader.DownloadAsync(url, "ffmpeg");
+
+//if (result.Successful)
+//{
+//    var ffprobePath = result.FfprobePath;
+//}
 ```
 
 ## Usage Example
