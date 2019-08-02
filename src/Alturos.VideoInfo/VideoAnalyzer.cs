@@ -55,7 +55,7 @@ namespace Alturos.VideoInfo
             var startInfo = new ProcessStartInfo
             {
                 FileName = this._ffprobePath,
-                Arguments = $"-v quiet -print_format json -show_format -show_streams {videoFilePath}",
+                Arguments = $"-v quiet -print_format json -show_format -show_streams \"{videoFilePath}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
             };
