@@ -8,6 +8,7 @@
     <Authors>Alturos Destinations</Authors>
     <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</RepositoryUrl>
+    <IconUrl>https://raw.githubusercontent.com/AlturosDestinations/Alturos.VideoInfo/master/doc/logo.png</IconUrl>
     <PackageTags>ffprobe media video audio metadata video-duration</PackageTags>
     <Description>A .net wrapper for ffprobe</Description>
     <FileVersion>1.0.3</FileVersion>
