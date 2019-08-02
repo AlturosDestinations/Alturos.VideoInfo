@@ -1,3 +1,5 @@
+![Alturos.VideoInfo](doc/logo-banner.png)
+
 # Alturos.VideoInfo
 
 With this project you can access the metadata of a video (e.g. its duration, bitrate, codec, etc.).
