@@ -79,5 +79,19 @@ namespace Alturos.VideoInfo.UnitTest
             Assert.IsTrue(anazlyeResult.Successful);
             Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);
         }
+
+        [TestMethod]
+        public async Task GetVideoInfo_HTTPVideoURL_IsValid()
+        {
+            VideoAnalyzer videoAnalyzer = new VideoAnalyzer();
+            Assert.AreEqual(videoAnalyzer.IsValidURL("https://www.sample-videos.com/video123/mp4/240/big_buck_bunny_240p_1mb.mp4"), true);
+        }
+
+        [TestMethod]
+        public async Task GetVideoInfo_HTTPVideoURL_IsNotValid()
+        {
+            VideoAnalyzer videoAnalyzer = new VideoAnalyzer();
+            Assert.AreEqual(videoAnalyzer.IsValidURL("ftp://www.sample-videos.com/video123/mp4/240/big_buck_bunny_240p_1mb.mp4"), false);
+        }
     }
 }
