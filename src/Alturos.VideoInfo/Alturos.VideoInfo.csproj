@@ -3,17 +3,17 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <AssemblyVersion>1.0.6</AssemblyVersion>
     <Company>Alturos Destinations</Company>
     <Authors>Alturos Destinations</Authors>
     <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</RepositoryUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/AlturosDestinations/Alturos.VideoInfo/master/doc/logo.png</PackageIconUrl>
     <PackageTags>ffprobe media video audio metadata video-duration</PackageTags>
-    <Description>A .net wrapper for ffprobe</Description>
-    <FileVersion>1.0.5</FileVersion>
-    <Version>1.0.5</Version>
-    <PackageReleaseNotes>Optimize video path logic, add logo</PackageReleaseNotes>
+    <Description>Get Video metadata (video duration, bitrate, codecs, video resolutions,...) .net wrapper for ffprobe</Description>
+    <FileVersion>1.0.6</FileVersion>
+    <Version>1.0.6</Version>
+    <PackageReleaseNotes>Add a new method to analyze video from byte array</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
