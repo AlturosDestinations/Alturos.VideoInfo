@@ -14,23 +14,12 @@ Quickly install Alturos.VideoInfo via [NuGet](https://www.nuget.org/packages/Alt
 PM> Install-Package Alturos.VideoInfo
 ```
 
-## Downloading ffprobe via code
-```cs
-var fileDownloader = new FileDownloader();
-var url = fileDownloader.GetFfmpegPackageUrl();
-var result = await fileDownloader.DownloadAsync(url, "ffmpeg");
-
-//if (result.Successful)
-//{
-//	var ffprobePath = result.FfprobePath;
-//}
-```
-
 ## Usage Example
 ```cs
 var videoFilePath = "myVideo.mp4";
+var ffprobePath = @"ffmpeg\ffprobe.exe";
 
-var videoAnalyer = new VideoAnalyzer();
+var videoAnalyer = new VideoAnalyzer(ffprobePath);
 var analyzeResult = videoAnalyer.GetVideoInfo(videoFilePath);
 var videoInfo = analyzeResult.VideoInfo;
 
@@ -47,4 +36,16 @@ var videoInfo = analyzeResult.VideoInfo;
 //videoInfo.Format.Tags["encoder"] = Lavf57.76.100
 //videoInfo.Streams[0].CodecType = "video" //Video, Audio
 //videoInfo.Streams[0]...
+```
+
+## Downloading ffprobe via code
+```cs
+var fileDownloader = new FileDownloader();
+var url = fileDownloader.GetFfmpegPackageUrl();
+var result = await fileDownloader.DownloadAsync(url, "ffmpeg");
+
+//if (result.Successful)
+//{
+//	var ffprobePath = result.FfprobePath;
+//}
 ```
