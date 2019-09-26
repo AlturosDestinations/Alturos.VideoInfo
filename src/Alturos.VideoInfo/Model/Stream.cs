@@ -6,11 +6,20 @@
         public string CodecName { get; set; }
         public string CodecLongName { get; set; }
         public string Profile { get; set; }
+        /// <summary>
+        /// Describes the type of the stream as either Audio or Video
+        /// </summary>
         public string CodecType { get; set; }
         public string CodecTimeBase { get; set; }
         public string CodecTagString { get; set; }
         public string CodecTag { get; set; }
+        /// <summary>
+        /// Width of the video if the codec type is Video
+        /// </summary>
         public int Width { get; set; }
+        /// <summary>
+        /// Height of the video if the codec type is Video
+        /// </summary>
         public int Height { get; set; }
         public int CodedWidth { get; set; }
         public int CodedHeight { get; set; }
