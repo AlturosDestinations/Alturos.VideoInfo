@@ -1,7 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -36,22 +35,6 @@ namespace Alturos.VideoInfo.UnitTest
             return true;
         }
 
-        private async Task DownloadFfprobeAsync(string ffmpegPath)
-        {
-            var ffmpegPackageUrl = "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.1.3-win64-static.zip";
-            var ffmpegZipFilePath = "ffmpeg.zip";
-
-            if (!File.Exists(ffmpegZipFilePath))
-            {
-                if (!await this.DownloadFileAsync(ffmpegPackageUrl, ffmpegZipFilePath))
-                {
-                    Assert.Fail("Cannot download ffmpeg package");
-                }
-
-                ZipFile.ExtractToDirectory(ffmpegZipFilePath, ffmpegPath, overwriteFiles: true);
-            }
-        }
-
         private async Task<string> GetTestVideoPathAsync()
         {
             var testVideoZipFilePath = "TestVideos.zip";
@@ -70,23 +53,11 @@ namespace Alturos.VideoInfo.UnitTest
         [TestMethod]
         public async Task CheckFFprobeWrapperFile()
         {
-            #region Prepare FFprobe
-
-            var ffmpegPath = "ffmpeg";
-            await this.DownloadFfprobeAsync(ffmpegPath);
-
-            var files = Directory.GetFiles(ffmpegPath, "ffprobe.exe", SearchOption.AllDirectories);
-            var ffprobePath = files.FirstOrDefault();
-            if (string.IsNullOrEmpty(ffprobePath))
-            {
-                Assert.Fail("Cannot found ffprobe");
-            }
-
-            #endregion
-
+            var fileDownloader = new FileDownloader();
+            var downloadResult = await fileDownloader.DownloadAsync("ffmpeg");
             var testVideoPath = await this.GetTestVideoPathAsync();
 
-            var videoAnalyzer = new VideoAnalyzer(ffprobePath);
+            var videoAnalyzer = new VideoAnalyzer(downloadResult.FfprobePath);
             var anazlyeResult = videoAnalyzer.GetVideoInfo(testVideoPath);
             Assert.IsTrue(anazlyeResult.Successful, "Get VideoInfo is not successful");
             Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);
@@ -95,24 +66,12 @@ namespace Alturos.VideoInfo.UnitTest
         [TestMethod]
         public async Task CheckFFprobeWrapperStream()
         {
-            #region Prepare FFprobe
-
-            var ffmpegPath = "ffmpeg";
-            await this.DownloadFfprobeAsync(ffmpegPath);
-
-            var files = Directory.GetFiles(ffmpegPath, "ffprobe.exe", SearchOption.AllDirectories);
-            var ffprobePath = files.FirstOrDefault();
-            if (string.IsNullOrEmpty(ffprobePath))
-            {
-                Assert.Fail("Cannot found ffprobe");
-            }
-
-            #endregion
-
+            var fileDownloader = new FileDownloader();
+            var downloadResult = await fileDownloader.DownloadAsync("ffmpeg");
             var testVideoPath = await this.GetTestVideoPathAsync();
             var videoData = await File.ReadAllBytesAsync(testVideoPath);
 
-            var videoAnalyzer = new VideoAnalyzer(ffprobePath);
+            var videoAnalyzer = new VideoAnalyzer(downloadResult.FfprobePath);
             var anazlyeResult = videoAnalyzer.GetVideoInfo(videoData);
             Assert.IsTrue(anazlyeResult.Successful, $"Get VideoInfo is not successful {anazlyeResult.ErrorMessage}");
             Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);

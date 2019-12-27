@@ -10,13 +10,20 @@ namespace Alturos.VideoInfo
 {
     public class FileDownloader
     {
-        public string GetFfmpegPackageUrl()
+        private readonly string _version;
+
+        public FileDownloader(string version = "4.1.3")
         {
-            var win64 = "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.1.3-win64-static.zip";
-            var win32 = "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-4.1.3-win32-static.zip";
+            this._version = version;
+        }
+
+        private string GetFfmpegPackageUrl()
+        {
+            var win64 = $"https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-{this._version}-win64-static.zip";
+            var win32 = $"https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-{this._version}-win32-static.zip";
+            var macos64 = $"https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-{this._version}-macos64-static.zip";
 
 #if NETSTANDARD2_0
-            var macos64 = "https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.1.3-macos64-static.zip";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -51,11 +58,24 @@ namespace Alturos.VideoInfo
             throw new NotSupportedException("Binary download is not supported");
         }
 
+        public async Task<FfmpegDownloadResult> DownloadAsync(string destinationPath)
+        {
+            var url = this.GetFfmpegPackageUrl();
+            return await this.DownloadAsync(url, destinationPath);
+        }
+
         public async Task<FfmpegDownloadResult> DownloadAsync(string url, string destinationPath)
         {
             var uri = new Uri(url);
             var fileName = Path.GetFileName(uri.LocalPath);
+            var folderName = Path.GetFileNameWithoutExtension(fileName);
             var filePath = Path.Combine(destinationPath, fileName);
+            var packagePath = Path.Combine(destinationPath, folderName, "bin");
+
+            if (Directory.Exists(packagePath))
+            {
+                return this.GetPaths(packagePath);
+            }
 
             if (!Directory.Exists(destinationPath))
             {
@@ -76,8 +96,7 @@ namespace Alturos.VideoInfo
                         };
                     }
 
-                    var fileContentStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
+                    using (var fileContentStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     using (var sourceStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
                     {
                         fileContentStream.Seek(0, SeekOrigin.Begin);
@@ -86,24 +105,30 @@ namespace Alturos.VideoInfo
                 }
             }
 
-            var folderName = Path.GetFileNameWithoutExtension(fileName);
-            var folderPath = Path.Combine(destinationPath, folderName);
-
-            if (Directory.Exists(folderPath))
-            {
-                Directory.Delete(folderPath, true);
-            }
-
-            ZipFile.ExtractToDirectory(filePath, folderPath);
+            ZipFile.ExtractToDirectory(filePath, destinationPath);
             File.Delete(filePath);
 
-            var basePath = Path.Combine(destinationPath, folderName, folderName, "bin");
-            return new FfmpegDownloadResult
+            return this.GetPaths(packagePath);
+        }
+
+        private FfmpegDownloadResult GetPaths(string packagePath)
+        {
+            var item = new FfmpegDownloadResult
             {
                 Successful = true,
-                FfmpegPath = Path.Combine(basePath, "ffmpeg.exe"),
-                FfprobePath = Path.Combine(basePath, "ffprobe.exe"),
-                FfplayPath = Path.Combine(basePath, "ffplay.exe")
+                FfmpegPath = Path.Combine(packagePath, "ffmpeg.exe"),
+                FfprobePath = Path.Combine(packagePath, "ffprobe.exe"),
+                FfplayPath = Path.Combine(packagePath, "ffplay.exe")
+            };
+
+            if (File.Exists(item.FfmpegPath) && File.Exists(item.FfprobePath) && File.Exists(item.FfplayPath))
+            {
+                return item;
+            }
+
+            return new FfmpegDownloadResult
+            {
+                Successful = false
             };
         }
     }
