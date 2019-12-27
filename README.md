@@ -39,6 +39,8 @@ var videoInfo = analyzeResult.VideoInfo;
 ```
 
 ## Downloading ffprobe via code
+Currently Windows and MacOS are supported
+
 ```cs
 var fileDownloader = new FileDownloader();
 var result = await fileDownloader.DownloadAsync("ffmpeg");
