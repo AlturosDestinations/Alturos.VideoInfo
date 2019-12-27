@@ -41,8 +41,7 @@ var videoInfo = analyzeResult.VideoInfo;
 ## Downloading ffprobe via code
 ```cs
 var fileDownloader = new FileDownloader();
-var url = fileDownloader.GetFfmpegPackageUrl();
-var result = await fileDownloader.DownloadAsync(url, "ffmpeg");
+var result = await fileDownloader.DownloadAsync("ffmpeg");
 
 //if (result.Successful)
 //{
