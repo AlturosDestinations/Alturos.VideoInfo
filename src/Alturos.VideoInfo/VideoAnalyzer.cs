@@ -62,23 +62,7 @@ namespace Alturos.VideoInfo
         /// <returns></returns>
         public AnalyzeResult GetVideoInfo(byte[] data)
         {
-            var mediaInput = new MediaInput();
-
-            //Set probing size in bytes, i.e. the size of the data to analyze to get stream information.
-            //A higher value will enable detecting more information in case it is dispersed into the stream,
-            //but will increase latency. Must be an integer not lesser than 32. It is 5000000 by default.
-            //TODO:5000000 not work, check why 278188 working
-            var ffprobeMaxInputLength = 278188;
-            if (data.Length > ffprobeMaxInputLength)
-            {
-                mediaInput.FileContent = data.Take(ffprobeMaxInputLength).ToArray();
-            }
-            else
-            {
-                mediaInput.FileContent = data;
-            }
-
-            return this.GetVideoInfo(mediaInput);
+            return this.GetVideoInfo(new MediaInput { FileContent = data });
         }
 
         private AnalyzeResult GetVideoInfo(MediaInput mediaInput)
@@ -150,6 +134,16 @@ namespace Alturos.VideoInfo
                         return new AnalyzeResult { ErrorMessage = $"Timeout reached {this._timeout} (ms)" };
                     }
 
+                    var videoInfo = JsonConvert.DeserializeObject<VideoInfoResult>(json.ToString(), this._jsonSerializerSettings);
+                    if (videoInfo.Format == null && videoInfo.Streams == null)
+                    {
+                        return new AnalyzeResult { Successful = false, ErrorMessage = "No feedback from ffprobe" };
+                    }
+
+                    return new AnalyzeResult { Successful = true, VideoInfo = videoInfo };
+                }
+                catch (IOException)
+                {
                     var videoInfo = JsonConvert.DeserializeObject<VideoInfoResult>(json.ToString(), this._jsonSerializerSettings);
                     if (videoInfo.Format == null && videoInfo.Streams == null)
                     {
