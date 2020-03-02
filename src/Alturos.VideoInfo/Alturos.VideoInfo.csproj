@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>1.0.7</AssemblyVersion>
+    <AssemblyVersion>1.0.8</AssemblyVersion>
     <Company>Alturos Destinations</Company>
     <Authors>Alturos Destinations</Authors>
     <PackageProjectUrl>https://github.com/AlturosDestinations/Alturos.VideoInfo</PackageProjectUrl>
@@ -11,9 +11,9 @@
     <PackageIconUrl>https://raw.githubusercontent.com/AlturosDestinations/Alturos.VideoInfo/master/doc/logo.png</PackageIconUrl>
     <PackageTags>ffprobe media video audio metadata video-duration</PackageTags>
     <Description>Get Video metadata (video duration, bitrate, codecs, video resolutions,...) .net wrapper for ffprobe</Description>
-    <FileVersion>1.0.7</FileVersion>
-    <Version>1.0.7</Version>
-    <PackageReleaseNotes>Show no console window on execute</PackageReleaseNotes>
+    <FileVersion>1.0.8</FileVersion>
+    <Version>1.0.8</Version>
+    <PackageReleaseNotes>Fix a problem with large videos</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

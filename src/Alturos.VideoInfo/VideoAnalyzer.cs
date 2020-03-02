@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
@@ -51,7 +52,7 @@ namespace Alturos.VideoInfo
                 return new AnalyzeResult { Successful = false, ErrorMessage = "File does not exist" };
             }
 
-            return this.GetVideoInfo(new FfprobeInput { FilePath = videoFilePath });
+            return this.GetVideoInfo(new MediaInput { FilePath = videoFilePath });
         }
 
         /// <summary>
@@ -61,10 +62,26 @@ namespace Alturos.VideoInfo
         /// <returns></returns>
         public AnalyzeResult GetVideoInfo(byte[] data)
         {
-            return this.GetVideoInfo(new FfprobeInput { FileContent = data });
+            var mediaInput = new MediaInput();
+
+            //Set probing size in bytes, i.e. the size of the data to analyze to get stream information.
+            //A higher value will enable detecting more information in case it is dispersed into the stream,
+            //but will increase latency. Must be an integer not lesser than 32. It is 5000000 by default.
+            //TODO:5000000 not work, check why 278188 working
+            var ffprobeMaxInputLength = 278188;
+            if (data.Length > ffprobeMaxInputLength)
+            {
+                mediaInput.FileContent = data.Take(ffprobeMaxInputLength).ToArray();
+            }
+            else
+            {
+                mediaInput.FileContent = data;
+            }
+
+            return this.GetVideoInfo(mediaInput);
         }
 
-        private AnalyzeResult GetVideoInfo(FfprobeInput ffprobeInput)
+        private AnalyzeResult GetVideoInfo(MediaInput mediaInput)
         {
             if (!File.Exists(this._ffprobePath))
             {
@@ -79,14 +96,14 @@ namespace Alturos.VideoInfo
                 CreateNoWindow = true,
             };
 
-            if (ffprobeInput.FileContent != null)
+            if (mediaInput.FileContent != null)
             {
                 startInfo.RedirectStandardInput = true;
                 startInfo.Arguments = $"-v quiet -print_format json -show_format -show_streams -";
             }
             else
             {
-                startInfo.Arguments = $"-v quiet -print_format json -show_format -show_streams \"{ffprobeInput.FilePath}\"";
+                startInfo.Arguments = $"-v quiet -print_format json -show_format -show_streams \"{mediaInput.FilePath}\"";
             }
 
             using (var outputWaitHandle = new AutoResetEvent(false))
@@ -118,11 +135,11 @@ namespace Alturos.VideoInfo
 
                     process.BeginOutputReadLine();
 
-                    if (ffprobeInput.FileContent != null)
+                    if (mediaInput.FileContent != null)
                     {
                         using (var ffprobeIn = process.StandardInput.BaseStream)
                         {
-                            ffprobeIn.Write(ffprobeInput.FileContent, 0, ffprobeInput.FileContent.Length);
+                            ffprobeIn.Write(mediaInput.FileContent, 0, mediaInput.FileContent.Length);
                             ffprobeIn.Flush();
                             ffprobeIn.Close();
                         }
