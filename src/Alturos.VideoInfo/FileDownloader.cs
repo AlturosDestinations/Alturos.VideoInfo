@@ -59,13 +59,13 @@ namespace Alturos.VideoInfo
             throw new NotSupportedException("Binary download is not supported");
         }
 
-        public async Task<FfmpegDownloadResult> DownloadAsync(string destinationPath, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<FfmpegDownloadResult> DownloadAsync(string destinationPath, CancellationToken cancellationToken = default)
         {
             var url = this.GetFfmpegPackageUrl();
             return await this.DownloadAsync(url, destinationPath, cancellationToken);
         }
 
-        public async Task<FfmpegDownloadResult> DownloadAsync(string url, string destinationPath, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<FfmpegDownloadResult> DownloadAsync(string url, string destinationPath, CancellationToken cancellationToken = default)
         {
             var uri = new Uri(url);
             var fileName = Path.GetFileName(uri.LocalPath);

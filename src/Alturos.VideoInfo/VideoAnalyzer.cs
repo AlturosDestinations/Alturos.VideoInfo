@@ -46,7 +46,7 @@ namespace Alturos.VideoInfo
         /// </summary>
         /// <param name="videoFilePath">Path to the video</param>
         /// <returns></returns>
-        public async Task<AnalyzeResult> GetVideoInfoAsync(string videoFilePath, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<AnalyzeResult> GetVideoInfoAsync(string videoFilePath, CancellationToken cancellationToken = default)
         {
             if (!File.Exists(videoFilePath))
             {
@@ -62,13 +62,13 @@ namespace Alturos.VideoInfo
         /// </summary>
         /// <param name="data">Video data</param>
         /// <returns></returns>
-        public async Task<AnalyzeResult> GetVideoInfoAsync(byte[] data, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<AnalyzeResult> GetVideoInfoAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             cancellationToken.Register(() => this.KillProcess());
             return await this.GetVideoInfoAsync(new MediaInput { FileContent = data }, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<AnalyzeResult> GetVideoInfoAsync(MediaInput mediaInput, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<AnalyzeResult> GetVideoInfoAsync(MediaInput mediaInput, CancellationToken cancellationToken = default)
         {
             if (!File.Exists(this._ffprobePath))
             {
@@ -181,7 +181,10 @@ namespace Alturos.VideoInfo
                     this._process.Kill();
                 }
             }
-            catch (Exception) { }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.ToString());
+            }
         }
     }
 }
