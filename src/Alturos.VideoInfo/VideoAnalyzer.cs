@@ -129,7 +129,7 @@ namespace Alturos.VideoInfo
                             var packageSize = 100000;
                             for (var i = 0; i < mediaInput.FileContent.Length; i += packageSize)
                             {
-                                var package = mediaInput.FileContent.Skip(packageSize * i).Take(packageSize).ToArray();
+                                var package = mediaInput.FileContent.Skip(i).Take(packageSize).ToArray();
                                 await ffprobeIn.WriteAsync(package, 0, package.Length, cancellationToken);
                             }
                             await ffprobeIn.FlushAsync(cancellationToken);
@@ -155,7 +155,7 @@ namespace Alturos.VideoInfo
                     var videoInfo = JsonConvert.DeserializeObject<VideoInfoResult>(json.ToString(), this._jsonSerializerSettings);
                     if (videoInfo.Format == null && videoInfo.Streams == null)
                     {
-                        return new AnalyzeResult { Successful = false, ErrorMessage = "No feedback from ffprobe" };
+                        return new AnalyzeResult { Successful = false, ErrorMessage = "No feedback from ffprobe (IOException)" };
                     }
 
                     return new AnalyzeResult { Successful = true, VideoInfo = videoInfo };
