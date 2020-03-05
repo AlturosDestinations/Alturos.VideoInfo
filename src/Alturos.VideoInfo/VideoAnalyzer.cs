@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+using System.Threading.Tasks;
 
 namespace Alturos.VideoInfo
 {
@@ -16,6 +16,7 @@ namespace Alturos.VideoInfo
         private readonly string _ffprobePath;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly int _timeout;
+        private Process _process;
 
         /// <summary>
         /// VideoAnalyzer
@@ -43,29 +44,31 @@ namespace Alturos.VideoInfo
         /// <summary>
         /// GetVideoInfo
         /// </summary>
-        /// <param name="videoFilePath">path to the video</param>
+        /// <param name="videoFilePath">Path to the video</param>
         /// <returns></returns>
-        public AnalyzeResult GetVideoInfo(string videoFilePath)
+        public async Task<AnalyzeResult> GetVideoInfoAsync(string videoFilePath, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!File.Exists(videoFilePath))
             {
                 return new AnalyzeResult { Successful = false, ErrorMessage = "File does not exist" };
             }
 
-            return this.GetVideoInfo(new MediaInput { FilePath = videoFilePath });
+            cancellationToken.Register(() => this.KillProcess());
+            return await this.GetVideoInfoAsync(new MediaInput { FilePath = videoFilePath }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// GetVideoInfo
         /// </summary>
-        /// <param name="videoFilePath">path to the video</param>
+        /// <param name="data">Video data</param>
         /// <returns></returns>
-        public AnalyzeResult GetVideoInfo(byte[] data)
+        public async Task<AnalyzeResult> GetVideoInfoAsync(byte[] data, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.GetVideoInfo(new MediaInput { FileContent = data });
+            cancellationToken.Register(() => this.KillProcess());
+            return await this.GetVideoInfoAsync(new MediaInput { FileContent = data }, cancellationToken).ConfigureAwait(false);
         }
 
-        private AnalyzeResult GetVideoInfo(MediaInput mediaInput)
+        private async Task<AnalyzeResult> GetVideoInfoAsync(MediaInput mediaInput, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!File.Exists(this._ffprobePath))
             {
@@ -105,31 +108,36 @@ namespace Alturos.VideoInfo
                     json.AppendLine(e.Data);
                 });
 
-                var process = new Process();
+                this._process = new Process();
 
                 try
                 {
-                    process.StartInfo = startInfo;
-                    process.OutputDataReceived += dataReceived;
+                    this._process.StartInfo = startInfo;
+                    this._process.OutputDataReceived += dataReceived;
 
-                    if (!process.Start())
+                    if (!this._process.Start())
                     {
                         return new AnalyzeResult { ErrorMessage = "Cannot start ffprobe" };
                     }
 
-                    process.BeginOutputReadLine();
+                    this._process.BeginOutputReadLine();
 
                     if (mediaInput.FileContent != null)
                     {
-                        using (var ffprobeIn = process.StandardInput.BaseStream)
+                        using (var ffprobeIn = this._process.StandardInput.BaseStream)
                         {
-                            ffprobeIn.Write(mediaInput.FileContent, 0, mediaInput.FileContent.Length);
-                            ffprobeIn.Flush();
+                            var packageSize = 100000;
+                            for (var i = 0; i < mediaInput.FileContent.Length; i += packageSize)
+                            {
+                                var package = mediaInput.FileContent.Skip(packageSize * i).Take(packageSize).ToArray();
+                                await ffprobeIn.WriteAsync(package, 0, package.Length, cancellationToken);
+                            }
+                            await ffprobeIn.FlushAsync(cancellationToken);
                             ffprobeIn.Close();
                         }
                     }
 
-                    if (!process.WaitForExit(this._timeout) || !outputWaitHandle.WaitOne(this._timeout))
+                    if (!this._process.WaitForExit(this._timeout) || !outputWaitHandle.WaitOne(this._timeout))
                     {
                         return new AnalyzeResult { ErrorMessage = $"Timeout reached {this._timeout} (ms)" };
                     }
@@ -158,10 +166,22 @@ namespace Alturos.VideoInfo
                 }
                 finally
                 {
-                    process.OutputDataReceived -= dataReceived;
-                    process?.Dispose();
+                    this._process.OutputDataReceived -= dataReceived;
+                    this._process?.Dispose();
                 }
             }
+        }
+
+        private void KillProcess()
+        {
+            try
+            {
+                if (this._process != null && !this._process.HasExited)
+                {
+                    this._process.Kill();
+                }
+            }
+            catch (Exception) { }
         }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Alturos.VideoInfo.UnitTest
@@ -58,9 +59,9 @@ namespace Alturos.VideoInfo.UnitTest
             var testVideoPath = await this.GetTestVideoPathAsync();
 
             var videoAnalyzer = new VideoAnalyzer(downloadResult.FfprobePath);
-            var anazlyeResult = videoAnalyzer.GetVideoInfo(testVideoPath);
-            Assert.IsTrue(anazlyeResult.Successful, "Get VideoInfo is not successful");
-            Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);
+            var analyzeResult = await videoAnalyzer.GetVideoInfoAsync(testVideoPath);
+            Assert.IsTrue(analyzeResult.Successful, "Get VideoInfo is not successful");
+            Assert.AreEqual(120, analyzeResult.VideoInfo.Format.Duration);
         }
 
         [TestMethod]
@@ -72,9 +73,9 @@ namespace Alturos.VideoInfo.UnitTest
             var videoData = await File.ReadAllBytesAsync(testVideoPath);
 
             var videoAnalyzer = new VideoAnalyzer(downloadResult.FfprobePath);
-            var anazlyeResult = videoAnalyzer.GetVideoInfo(videoData);
-            Assert.IsTrue(anazlyeResult.Successful, $"Get VideoInfo is not successful {anazlyeResult.ErrorMessage}");
-            Assert.AreEqual(120, anazlyeResult.VideoInfo.Format.Duration);
+            var analyzeResult = await videoAnalyzer.GetVideoInfoAsync(videoData);
+            Assert.IsTrue(analyzeResult.Successful, $"Get VideoInfo is not successful {analyzeResult.ErrorMessage}");
+            Assert.AreEqual(120, analyzeResult.VideoInfo.Format.Duration);
         }
     }
 }

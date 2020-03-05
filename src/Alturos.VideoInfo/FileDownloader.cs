@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Alturos.VideoInfo
@@ -58,13 +59,13 @@ namespace Alturos.VideoInfo
             throw new NotSupportedException("Binary download is not supported");
         }
 
-        public async Task<FfmpegDownloadResult> DownloadAsync(string destinationPath)
+        public async Task<FfmpegDownloadResult> DownloadAsync(string destinationPath, CancellationToken cancellationToken = default(CancellationToken))
         {
             var url = this.GetFfmpegPackageUrl();
-            return await this.DownloadAsync(url, destinationPath);
+            return await this.DownloadAsync(url, destinationPath, cancellationToken);
         }
 
-        public async Task<FfmpegDownloadResult> DownloadAsync(string url, string destinationPath)
+        public async Task<FfmpegDownloadResult> DownloadAsync(string url, string destinationPath, CancellationToken cancellationToken = default(CancellationToken))
         {
             var uri = new Uri(url);
             var fileName = Path.GetFileName(uri.LocalPath);
@@ -86,7 +87,7 @@ namespace Alturos.VideoInfo
             {
                 httpClient.Timeout = TimeSpan.FromMinutes(10);
 
-                using (var httpResponseMessage = await httpClient.GetAsync(url).ConfigureAwait(false))
+                using (var httpResponseMessage = await httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false))
                 {
                     if (!httpResponseMessage.IsSuccessStatusCode)
                     {
@@ -100,7 +101,7 @@ namespace Alturos.VideoInfo
                     using (var sourceStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
                     {
                         fileContentStream.Seek(0, SeekOrigin.Begin);
-                        await fileContentStream.CopyToAsync(sourceStream);
+                        await fileContentStream.CopyToAsync(sourceStream, 4096, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
