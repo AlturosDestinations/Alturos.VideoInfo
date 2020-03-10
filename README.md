@@ -20,7 +20,7 @@ var videoFilePath = "myVideo.mp4";
 var ffprobePath = @"ffmpeg\ffprobe.exe";
 
 var videoAnalyer = new VideoAnalyzer(ffprobePath);
-var analyzeResult = videoAnalyer.GetVideoInfo(videoFilePath);
+var analyzeResult = await videoAnalyer.GetVideoInfoAsync(videoFilePath);
 var videoInfo = analyzeResult.VideoInfo;
 
 //videoInfo.Format.Filename = "TestVideos\\video1.mp4"
