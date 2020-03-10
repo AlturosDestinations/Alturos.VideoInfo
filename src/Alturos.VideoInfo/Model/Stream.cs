@@ -41,7 +41,7 @@
         public string TimeBase { get; set; }
         public int StartPts { get; set; }
         public string StartTime { get; set; }
-        public int DurationTs { get; set; }
+        public long DurationTs { get; set; }
         public double Duration { get; set; }
         public string BitRate { get; set; }
         public string BitsPerRawSample { get; set; }
